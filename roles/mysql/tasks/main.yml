@@ -1,0 +1,11 @@
+---
+# tasks file for roles/mysql
+
+- include: add_repo.yml
+
+- include: install_mysql.yml
+
+- include: init_mysql.yml
+
+- include: config_slave.yml
+  when: "(mysql_mode) == 'multi'"

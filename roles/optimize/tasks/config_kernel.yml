@@ -1,0 +1,51 @@
+- name: set /etc/profile
+  lineinfile:
+    path: /etc/profile
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: 'HISTTIMEFORMAT',line: 'export HISTTIMEFORMAT="%F %T `whoami` "' }
+    - { regexp: '^HISTSIZE',line: 'HISTSIZE=3000' }
+    - { regexp: '^shopt',line: 'shopt -s histappend' }
+    - { regexp: '^export LC_ALL',line: 'export LC_ALL=en_US.utf8' }
+  notify: source /etc/profile
+
+- name: config /etc/systemd/system.conf
+  lineinfile:
+    path: /etc/systemd/system.conf
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: '^DefaultLimitNOFILE',line: 'DefaultLimitNOFILE=65535' }
+    - { regexp: '^DefaultLimitNPROC',line: 'DefaultLimitNPROC=65535' }
+  notify: systemctl daemon-reexec
+
+- name: config /etc/rc.d/rc.local is Huge pages
+  template:
+    src: rc.local
+    dest: /etc/rc.d/rc.local
+    owner: root
+    group: root
+    mode: '0755'
+  notify: source rc.local
+
+- name: Set /etc/security/limits.conf
+  pam_limits:
+    domain: '*'
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.item }}"
+    value: '65535'
+  with_items:
+    - { type: 'soft',item: 'nproc' }
+    - { type: 'hard',item: 'nproc' }
+    - { type: 'soft',item: 'nofile' }
+    - { type: 'hard',item: 'nofile' }
+
+- name: config /etc/sysctl.conf
+  template:
+    src: sysctl.conf
+    dest: /etc/sysctl.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: sysctl -p 

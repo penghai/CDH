@@ -1,0 +1,21 @@
+#Set the type of yum source to use (local|aliyun)
+install_yum_mode: local
+ntp_server: ntp.aliyun.com
+
+#Mysql configuration parameters
+
+#single/multi
+mysql_mode: multi 
+mysql_dir: /var/lib/mysql
+mysql_user: root
+mysql_password: Nd6xrootroot#$
+master_user: slave
+master_password: Nd6xrootroot#$
+
+#Set the type of yum source to use (local|file)
+cdh_install_mode: local
+cdh_mysql_password: Nd6xroot#$
+manager_server_name: test01
+data_disk:
+  - [/dev/sdb,/data1]
+#  - [/dev/sdc,/data2]

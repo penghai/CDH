@@ -1,0 +1,61 @@
+- name: remove openjdk
+  yum:
+    name: '*openjdk*'
+    state: absent
+
+- name: Add cloudera-manager repository
+  template:
+    src: cloudera-manager.repo
+    dest: /etc/yum.repos.d/cloudera-manager.repo
+    owner: root
+    group: root
+  when: "(cdh_install_mode) == 'local'"
+
+- name: yum update cache
+  yum:
+    update_cache: yes
+    state: present
+
+- name: install jdk1.8
+  yum:
+    name: oracle-j2sdk1.8
+    state: present
+
+- name: create directory /opt/soft
+  file:
+    path: /opt/soft
+    state: directory
+  when: "(cdh_install_mode) == 'file'"
+
+- name: copy oracle-j2sdk1.8-1.8.0+update181-1.x86_64.rpm file
+  copy:
+    src: files/oracle-j2sdk1.8-1.8.0+update181-1.x86_64.rpm
+    dest: /opt/soft/
+  when: "(cdh_install_mode) == 'file'"
+
+- name: install file oracle-j2sdk1.8-1.8.0+update181-1.x86_64.rpm
+  yum:
+    name: /opt/soft/oracle-j2sdk1.8-1.8.0+update181-1.x86_64.rpm
+    state: present
+  when: "(cdh_install_mode) == 'file'"
+
+- name: config /etc/profile file
+  blockinfile:
+    path: /etc/profile
+    block: |
+      export JAVA_HOME=/usr/java/jdk1.8.0_181-cloudera
+      export JRE_HOME=$JAVA_HOME/jre
+      export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
+      export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+    state: present
+  notify: source /etc/profile
+
+- name: create directory /usr/share/java/
+  file:
+    path: /usr/share/java/
+    state: directory
+
+- name: copy mysql-connector-java-5.1.46-bin.jar file
+  copy:
+    src: mysql-connector-java-5.1.46-bin.jar
+    dest: /usr/share/java/mysql-connector-java.jar

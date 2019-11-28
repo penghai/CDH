@@ -1,0 +1,5 @@
+[cloudera-manager]
+name=Cloudera Manager 6.3.0
+baseurl=http://172.16.16.10/cm6/6.3.0/redhat7/yum/
+gpgcheck=0
+enabled=1

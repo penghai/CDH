@@ -1,0 +1,36 @@
+- name: install bash package
+  yum:
+    name:
+      - wget
+      - vim 
+      - net-tools
+      - bash-completion
+      - bash-completion-extras
+      - lrzsz
+      - sshpass
+      - gcc
+      - gcc-c++
+      - libffi-devel
+      - openssl-devel
+      - python-devel
+      - ntpdate
+      - chrony 
+      - xinetd
+      - bc
+    state: present
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+  notify: reboot 
+  
+- name: systemctl stop firewalld.service
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Set timezone to Asia/Shanghai
+  timezone:
+    name: Asia/Shanghai

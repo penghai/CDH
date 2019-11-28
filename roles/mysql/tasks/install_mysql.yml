@@ -1,0 +1,31 @@
+- name: remove mariadb
+  yum:
+    name: mariadb*
+    state: removed
+
+- name: install mysql
+  yum:
+    name:
+      - mysql-community-server
+      - MySQL-python
+    state: present
+
+- name: config /etc/my-multi.cnf
+  template:
+    src: my-multi.cnf
+    dest: /etc/my.cnf
+  notify: restart mysqld
+  when: "(mysql_mode) == 'multi'" 
+
+- name: config /etc/my-single.cnf
+  template:
+    src: my-single.cnf
+    dest: /etc/my.cnf
+  notify: restart mysqld
+  when: "(mysql_mode) == 'single'" 
+
+- name: start mysqld
+  service:
+    name: mysqld
+    state: started
+    enabled: yes

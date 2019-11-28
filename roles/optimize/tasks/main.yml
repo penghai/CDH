@@ -1,0 +1,14 @@
+---
+# tasks file for roles/optimize
+
+- include: add_repo.yml
+
+- include: install.yml
+
+- include: config_ssh.yml
+
+- include: config_chrony.yml
+
+- include: config_kernel.yml
+
+

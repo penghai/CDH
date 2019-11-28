@@ -1,0 +1,5 @@
+- hosts: cdh_nodes
+  tasks:
+    - name: update hosts
+      copy: src=etc_hosts dest=/etc/hosts force=yes
+      ignore_errors: yes

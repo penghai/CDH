@@ -1,0 +1,21 @@
+[cdh_nodes:children]
+cms_nodes
+cma_nodes
+
+[mysql_nodes:children]
+mysql_master
+mysql_slave
+
+[cms_nodes]
+172.16.14.31 ansible_ssh_host=172.16.14.31 ansible_ssh_user=root ansible_ssh_pass=nd6xrootroot
+
+[cma_nodes]
+172.16.14.31 ansible_ssh_host=172.16.14.31 ansible_ssh_user=root ansible_ssh_pass=nd6xrootroot
+172.16.14.32 ansible_ssh_host=172.16.14.32 ansible_ssh_user=root ansible_ssh_pass=nd6xrootroot
+172.16.14.33 ansible_ssh_host=172.16.14.33 ansible_ssh_user=root ansible_ssh_pass=nd6xrootroot
+
+[mysql_master:children]
+cms_nodes
+
+[mysql_slave]
+172.16.14.32 ansible_ssh_host=172.16.14.32 ansible_ssh_user=root ansible_ssh_pass=nd6xrootroot

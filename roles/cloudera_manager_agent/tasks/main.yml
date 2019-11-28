@@ -1,0 +1,4 @@
+---
+# tasks file for roles/cloudera_manager_agent
+
+- include: install.yml

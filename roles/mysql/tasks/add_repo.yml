@@ -1,0 +1,20 @@
+- name: Add local mysql57-community repository
+  template:
+    src: mysql57-community-local.repo
+    dest: /etc/yum.repos.d/mysql57-community.repo
+    owner: root
+    group: root
+  when: "(install_yum_mode) == 'local'"
+
+- name: Add mysql57-community repository
+  template:
+    src: mysql57-community.repo
+    dest: /etc/yum.repos.d/mysql57-community.repo
+    owner: root
+    group: root
+  when: "(install_yum_mode) == 'aliyun'"
+
+- name: yum update cache
+  yum:
+    update_cache: yes
+    state: present

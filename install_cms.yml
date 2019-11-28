@@ -1,0 +1,5 @@
+- hosts: cms_nodes
+  vars_files:
+    - "vars/cdh.yml"
+  roles:
+    - role: cloudera_manager_server

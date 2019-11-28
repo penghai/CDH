@@ -1,0 +1,69 @@
+- name: install cloudera-manager-server
+  yum:
+    name: cloudera-manager-server
+    state: present
+  when: "(cdh_install_mode) == 'local'"
+
+- name: create directory /opt/soft
+  file:
+    path: /opt/soft
+    state: directory
+  when: "(cdh_install_mode) == 'file'"
+
+- name: copy cloudera-manager-server file
+  copy:
+    src: files/{{item}}
+    dest: /opt/soft/
+  with_items:
+    - cloudera-manager-server-6.3.0-1281944.el7.x86_64.rpm
+    - cloudera-manager-daemons-6.3.0-1281944.el7.x86_64.rpm
+  when: "(cdh_install_mode) == 'file'"
+
+- name: install cloudera-manager-server
+  yum:
+    name:
+      - /opt/soft/cloudera-manager-server-6.3.0-1281944.el7.x86_64.rpm
+      - /opt/soft/cloudera-manager-daemons-6.3.0-1281944.el7.x86_64.rpm
+    state: present
+  when: "(cdh_install_mode) == 'file'"
+
+- name: copy cdh.sql
+  template:
+    src: cdh.sql
+    dest: /opt/cdh.sql
+
+- name: import cdh.sql
+  mysql_db:
+    login_user: "{{mysql_user}}"
+    login_password: "{{mysql_password}}"
+    state: import
+    name: all
+    target: /opt/cdh.sql
+
+- name: delete file cdh.sql
+  file:
+    path: /opt/cdh.sql
+    state: absent
+
+- name: Set up the Cloudera Manager Database
+  shell: /opt/cloudera/cm/schema/scm_prepare_database.sh mysql scm scm {{cdh_mysql_password}}
+#  register: info
+
+#- debug: var=info
+
+- name: copy parcels
+  copy:
+    src: files/{{item}}
+    dest: /opt/cloudera/parcel-repo/
+    owner: cloudera-scm
+    group: cloudera-scm
+  with_items:
+    - CDH-6.3.0-1.cdh6.3.0.p0.1279813-el7.parcel
+    - CDH-6.3.0-1.cdh6.3.0.p0.1279813-el7.parcel.sha
+    - manifest.json
+
+- name: start cloudera-manager-server
+  service:
+    name: cloudera-scm-server
+    state: started
+    enabled: yes

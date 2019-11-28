@@ -1,0 +1,34 @@
+#- name: delete /etc/fstab
+#  mount:
+#    path: "{{item[1]}}"
+#    src: "{{item[0]}}1"
+#    state: absent
+#  with_list: "{{data_disk}}"
+
+#- name: remove all partitions from disk
+#  parted:
+#    device: "{{item[0]}}"
+#    number: "1"
+#    state: absent
+#  with_list: "{{data_disk}}"
+
+- name: create new partition
+  parted:
+    device: "{{item[0]}}"
+    number: 1
+    state: present
+  with_list: "{{data_disk}}"
+
+- name: Create a xfs filesystem 
+  filesystem:
+    dev: "{{item[0]}}1"
+    fstype: xfs
+  with_list: "{{data_disk}}"
+
+- name: mount the partition and set the boot auto mount
+  mount:
+    path: "{{item[1]}}"
+    src: "{{item[0]}}1"
+    fstype: xfs
+    state: mounted
+  with_list: "{{data_disk}}"

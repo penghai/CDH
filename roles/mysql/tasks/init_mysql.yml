@@ -1,0 +1,29 @@
+- name: init the root password
+  shell: mysqlinitpasswd=$(cat /var/log/mysqld.log |grep "password is generated"|awk '{print $NF}') && mysql -uroot -p${mysqlinitpasswd} -S {{mysql_dir}}/mysql.sock -e "alter user 'root'@'localhost' identified by '{{mysql_password}}' PASSWORD EXPIRE NEVER;flush privileges;" --connect-expired-password
+  ignore_errors: yes
+
+- name: Removes all anonymous user accounts
+  mysql_user:
+    login_user: root
+    login_password: "{{mysql_password}}"
+    name: ''
+    host_all: yes
+    state: absent
+
+- name: Removes anonymous user account for localhost
+  mysql_user:
+    login_user: root
+    login_password: "{{mysql_password}}"
+    name: ''
+    host: localhost
+    state: absent
+
+- name: Add root user remote access
+  mysql_user:
+    login_user: root
+    login_password: "{{mysql_password}}"
+    host: '%'
+    name: "{{mysql_user}}"
+    password: "{{mysql_password}}"
+    priv: '*.*:ALL,GRANT'
+    state: present

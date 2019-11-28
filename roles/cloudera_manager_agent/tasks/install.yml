@@ -1,0 +1,42 @@
+- name: install cloudera-manager-agent
+  yum:
+    name: cloudera-manager-agent
+    state: present
+  when: "(cdh_install_mode) == 'local'"
+
+- name: create directory /opt/soft
+  file:
+    path: /opt/soft
+    state: directory
+  when: "(cdh_install_mode) == 'file'"
+
+- name: copy cloudera-manager-agent file
+  copy:
+    src: files/{{item}}
+    dest: /opt/soft/
+  with_items:
+    - cloudera-manager-agent-6.3.0-1281944.el7.x86_64.rpm
+    - cloudera-manager-daemons-6.3.0-1281944.el7.x86_64.rpm
+  when: "(cdh_install_mode) == 'file'"
+
+- name: install file oracle-j2sdk1.8-1.8.0+update181-1.x86_64.rpm
+  yum:
+    name:
+      - /opt/soft/cloudera-manager-agent-6.3.0-1281944.el7.x86_64.rpm
+      - /opt/soft/cloudera-manager-daemons-6.3.0-1281944.el7.x86_64.rpm
+    state: present
+  when: "(cdh_install_mode) == 'file'"
+
+- name: copy config.ini
+  template:
+    src: config.ini
+    dest: /etc/cloudera-scm-agent/config.ini
+    owner: cloudera-scm
+    group: cloudera-scm
+    mode: "0644"
+
+- name: start cloudera-manager-agent
+  service:
+    name: cloudera-scm-agent
+    state: started
+    enabled: yes
